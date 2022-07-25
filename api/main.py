@@ -27,4 +27,4 @@ def predict(file_path:str):
     # return {"status": 200,
     #         "message": "Successful"}
     # return FileResponse(file_path+'faces.jpeg')
-    return op.Optimizer()
+    return op.Optimizer('abcd',40,90,)
