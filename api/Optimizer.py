@@ -7,52 +7,52 @@ import tensorflow as tf
 
 class Optimizer:
 
-    def __init__(self, epoch,batch_size,learning_rate):
+    def __init__(self, epoch,batch_size,learning_rate,input_shape):
 
         self.epoch= epoch
         self.batch_size = batch_size
         self.optimizer = "adam"
         self.learning_rate = learning_rate
-        
+        self.input_shape = input_shape
 
-    def create_model(X_train, X_test, y_train, X_val, y_val):
+    def create_model(X_train, X_test, y_train, y_test, X_val, y_val ):
         pass
 
 
-    def preprocess(self,X_train, X_test, y_train, X_val, y_val):
+    def preprocess(self,X_train,y_train, X_test, y_test , X_val, y_val):
+        
 
-        X_train = X_train.reshape(48000, 784)
-        X_val = X_val.reshape(12000, 784)
-        X_test = X_test.reshape(10000, 784)
+        print(X_train.shape)
+        print(X_val.shape)
+        print(X_test.shape)
+
+        X_train = X_train.reshape(X_train.shape[0], X_train.shape[1]*X_train.shape[2],X_train.shape[3])
+        X_val = X_val.reshape(X_val.shape[0], X_val.shape[1]*X_val.shape[2],X_val.shape[3])
+        X_test = X_test.reshape(X_test.shape[0], X_test.shape[1]*X_test.shape[2],X_test.shape[3])
         X_train = X_train.astype('float32')
         X_val = X_val.astype('float32')
         X_test = X_test.astype('float32')
-        X_train /= 255
-        X_val /= 255
-        X_test/= 255
-
-        nb_classes = 10
-        y_train = to_categorical(y_train, nb_classes)
-        y_val = to_categorical(y_val, nb_classes)
-
-        return [X_train, X_test, y_train, X_val, y_val]
+        self.X_train = X_train/255
+        self.X_val = X_val/255
+        self.X_test= X_test/255   
 
 
-    def compile_run(self, X_train, X_test, X_val, y_val):
+    def compile_run(self):
 
         print(self.epoch)
         print(self.batch_size)
         print(self.optimizer)
         print(self.learning_rate)
         
-        self.compile(
+        self.blueprint.compile(
             loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
             metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
             optimizer=Adam(lr=self.learning_rate)
             )
 
         print("compiled")
-        return None
+
+        return None #Added to avoid training the model - unsupported machine
 
         training_st = time.process_time()
 
