@@ -2,29 +2,25 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import SGD, RMSprop, Adam
 import tensorflow_model_optimization as tfmot
 import tensorflow as tf
-
+import time
 
 
 class Optimizer:
 
-    def __init__(self, epoch,batch_size,learning_rate,input_shape):
+    def __init__(self, epoch,batch_size,learning_rate,input_shape,callbacks=None):
 
         self.epoch= epoch
         self.batch_size = batch_size
         self.optimizer = "adam"
         self.learning_rate = learning_rate
         self.input_shape = input_shape
+        self.callbacks = callbacks
 
     def create_model(X_train, X_test, y_train, y_test, X_val, y_val ):
         pass
 
 
     def preprocess(self,X_train,y_train, X_test, y_test , X_val, y_val):
-        
-
-        print(X_train.shape)
-        print(X_val.shape)
-        print(X_test.shape)
 
         X_train = X_train.reshape(X_train.shape[0], X_train.shape[1]*X_train.shape[2],X_train.shape[3])
         X_val = X_val.reshape(X_val.shape[0], X_val.shape[1]*X_val.shape[2],X_val.shape[3])
@@ -56,13 +52,26 @@ class Optimizer:
 
         training_st = time.process_time()
 
-        hist = self.fit(
-            X_train, X_test,
+
+        if self.callbacks is not None:
+            hist = self.fit(
+            self.X_train, self.X_test,
             batch_size=self.batch_size,
             epochs=self.epochs,
             verbose=2,
-            validation_data=(X_val, y_val)
+            validation_data=(self.X_val, self.y_val),
+            callbacks=self.pruning_callback
+            )
+
+
+        hist = self.fit(
+            self.X_train, self.X_test,
+            batch_size=self.batch_size,
+            epochs=self.epochs,
+            verbose=2,
+            validation_data=(self.X_val, self.y_val)
         )
+
 
         training_et = time.process_time()
 

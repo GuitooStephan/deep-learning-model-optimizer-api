@@ -9,10 +9,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 # from tensorflow.keras.datasets import fashion_mnist
-from Optimizer import Optimizer
-from techniques.Quantization import Quantization
 import tensorflow_model_optimization as tfmot
 
+from Optimizer import Optimizer
+from techniques.Quantization import Quantization
+from techniques.Pruning import Pruning
 
 app = FastAPI(
     title='DLMOptimizer',
@@ -84,17 +85,26 @@ def optimize(file_path:str):
 
     cnn_quantized = Quantization(epochs = 50,batch_size=120,learning_rate=10**-3,input_shape=(X_train.shape[1],X_train.shape[2],X_train.shape[3]))
     cnn_quantized.preprocess(X_train, y_train, X_test, y_test , X_val, y_val)
-    # cnn_quantized.create_model()
-
 
     #Compiling and running the model
-    hist,training_time = cnn_quantized.compile_run()
+    # hist,training_time = cnn_quantized.compile_run()
+    # print('Training time ', training_time)
+
+    # #Printing the losses
+    # cnn_quantized.calculate_loss(hist)
+
+
+    # PRUNING MODEL
+    pruning_callback = tfmot.sparsity.keras.UpdatePruningStep()
+    cnn_pruned= Pruning(epochs = 40,batch_size=128,learning_rate=10**-3,input_shape=(X_train.shape[1],X_train.shape[2],X_train.shape[3]),callbacks=pruning_callback)
+    cnn_pruned.preprocess(X_train, y_train, X_test, y_test , X_val, y_val)
+
+    #Compiling and running the model
+    hist,training_time = cnn_pruned.compile_run()
     print('Training time ', training_time)
-
-    #Printing the losses
-    cnn_quantized.calculate_loss(hist)
-
     
+    #Printing the losses
+    cnn_pruned.calculate_loss(hist)
 
 
 
