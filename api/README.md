@@ -15,7 +15,7 @@ pip install -r requirements.txt
 ```python
 cd api
 
-python Opt_generator.py
+uvicorn main:app --reload
 ```
 
 ## Contributing
