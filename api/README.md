@@ -4,6 +4,10 @@ An api to facilitate the optimization app
 
 ## Installation
 
+```bash
+git clone git@github.com:Shoab02/action-learning-api.git
+```
+
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the requirements.
 
 ```bash
