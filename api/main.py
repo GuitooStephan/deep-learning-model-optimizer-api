@@ -28,35 +28,7 @@ def read_home():
 
 @app.post("/read")
 def read(file_path:str):
-
-    X_train=[]
-    files = glob.glob(file_path+"/train/*")
-    for myFile in files:
-        image = cv2.imread(myFile)
-        image = cv2.resize(image,(32,32))
-        X_train.append(image)
-
-    X_test=[]
-    files = glob.glob(file_path+"/test/*")
-    for myFile in files:
-        image = cv2.imread(myFile)
-        image = cv2.resize(image,(32,32))
-        X_test.append(image)
-    
-    X_val=[]
-    files = glob.glob(file_path+"/val/*")
-    for myFile in files:
-        image = cv2.imread(myFile)
-        image = cv2.resize(image,(32,32))
-        X_val.append(image)
-
-    X_train=np.asarray(X_train)
-    X_test=np.asarray(X_test)
-    X_val=np.asarray(X_val)
-
-    print(X_train.shape)
-    print(X_test.shape[0])
-    print(X_test.shape[1])
+    pass
 
                                                                                                                                                                                                                                                                                                                                 
 
