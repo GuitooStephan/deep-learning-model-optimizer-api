@@ -10,9 +10,11 @@ from optimizers.optimizer import Optimizer
 
 
 class Quantization(Optimizer):
-    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer):
-        super().__init__(project_path, baseline_accuracy,
-                         epoch, batch_size, learning_rate, optimizer)
+    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer, color_scheme):
+        super().__init__(
+            project_path, baseline_accuracy,
+            epoch, batch_size, learning_rate,
+            optimizer, color_scheme)
         self.create_model()
         print('Quantization initialized')
 
@@ -64,5 +66,5 @@ class Quantization(Optimizer):
     def save_model(self):
 
         self.model.save(os.path.join(self.project_path, 'quantized_model.h5'))
-        open(os.join.path(self.project_path, "quantized_model_lite.tflite"),
+        open(os.path.join(self.project_path, "quantized_model_lite.tflite"),
              "wb").write(self.model_lite)

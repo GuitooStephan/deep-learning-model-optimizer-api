@@ -4,10 +4,6 @@ from fastapi import FastAPI
 from routers import optimizers
 from config.celery_utils import create_celery
 
-from Optimizer import Optimizer
-from techniques.Quantization import Quantization
-from techniques.Pruning import Pruning
-
 
 def create_app() -> FastAPI:
     current_app = FastAPI(

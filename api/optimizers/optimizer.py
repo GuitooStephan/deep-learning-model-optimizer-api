@@ -8,8 +8,8 @@ import tensorflow_model_optimization as tfmot
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 
 
-class Optimizer:
-    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer):
+class Optimizer(object):
+    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer, color_scheme):
         self.project_path = project_path
         self.baseline_accuracy = baseline_accuracy
         self.baseline_model_path = os.path.join(project_path, "model.h5")
@@ -17,6 +17,7 @@ class Optimizer:
         self.epoch = epoch
         self.batch_size = batch_size
         self.learning_rate = learning_rate
+        self.color_scheme = color_scheme
 
         self.set_optimizer(optimizer)
         self.load_baseline_model()
@@ -27,11 +28,15 @@ class Optimizer:
 
     def preprocess(self):
         X_train, X_test, X_val, y_train, y_test, y_val = get_dataset(
-            self.project_path
+            self.data_folder_path,
+            self.color_scheme
         )
         print(X_train.shape)
+        print(y_train.shape)
         print(X_val.shape)
+        print(y_val.shape)
         print(X_test.shape)
+        print(y_test.shape)
 
         X_train = X_train.astype('float32')
         X_val = X_val.astype('float32')
@@ -44,10 +49,7 @@ class Optimizer:
         self.y_val = y_val
         self.y_test = y_test
 
-        X_train_shape = self.X_train.shape
-        self.input_shape = (
-            X_train_shape[1], X_train_shape[2], X_train_shape[3]
-        )
+        self.set_input_shape()
 
     def compile_run(self):
         print(self.epoch)
@@ -62,33 +64,17 @@ class Optimizer:
             optimizer=self.optimizer
         )
 
-        print("compiled")
-
-        print('Fitting model...')
-        return None  # Added to avoid training the model - unsupported machine
+        # print('Fitting model...')
+        # return None  # Added to avoid training the model - unsupported machine
 
         training_st = time.process_time()
-
-        if optimizer == 'pruning':
-
-            self.hist = self.model.fit(
-                X_train, X_test,
-                batch_size=self.batch_size,
-                epochs=self.epochs,
-                verbose=2,
-                validation_data=(X_val, y_val),
-                callbacks = tfmot.sparsity.keras.UpdatePruningStep()
-            )
-            
-        else:
-
-            self.hist = self.model.fit(
-                X_train, X_test,
-                batch_size=self.batch_size,
-                epochs=self.epochs,
-                verbose=2,
-                validation_data=(X_val, y_val)
-            )
+        self.hist = self.model.fit(
+            self.X_train, self.y_train,
+            batch_size=self.batch_size,
+            epochs=self.epoch,
+            verbose=0,
+            validation_data=(self.X_val, self.y_val)
+        )
         training_et = time.process_time()
 
         self.training_time = training_et - training_st
@@ -137,3 +123,12 @@ class Optimizer:
             self.optimizer = RMSprop(learning_rate=self.learning_rate)
         else:
             raise ValueError("Invalid optimizer")
+
+    def set_input_shape(self):
+        if self.color_scheme == "rgb":
+            self.input_shape = (
+                self.X_train.shape[1], self.X_train.shape[2], self.X_train.shape[3])
+        elif self.color_scheme == "grayscale":
+            self.input_shape = (self.X_train.shape[1], self.X_train.shape[2])
+        else:
+            raise ValueError("Invalid color scheme")

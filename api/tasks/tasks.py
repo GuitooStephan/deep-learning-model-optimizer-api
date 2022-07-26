@@ -17,13 +17,15 @@ import tensorflow_model_optimization as tfmot
 )
 def apply_quantization(
         self, project_name: str, initiated_time: int, project_path: str,
-        baseline_accuracy: float, epoch: int, batch_size: int, learning_rate: float, optimizer: str,):
+        baseline_accuracy: float, epoch: int, batch_size: int,
+        learning_rate: float, optimizer: str, color_scheme: str):
 
     print('Task quantization:apply_quantization')
     # Creating a object of the chosen optimizer
     quantized_model = Quantization(
-        project_path=project_path, baseline_accuracy=baseline_accuracy,
-        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer
+        project_path, baseline_accuracy, epoch,
+        batch_size, learning_rate, optimizer,
+        color_scheme
     )
     print('Quantization model created')
     quantized_model.compile_run()
@@ -44,6 +46,8 @@ def apply_quantization(
     return result
 
 # Initiate Pruning
+
+
 @shared_task(
     bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 2},
     name='pruning:apply_pruning'
@@ -78,10 +82,10 @@ def apply_pruning(
         "technique": "Pruning",
         "initiated_time": initiated_time,
         "metrics": metrics,
-        "params":params
+        "params": params
     }
 
-    return result 
+    return result
 
 
 # Initiate Distillation
@@ -107,8 +111,7 @@ def apply_distillation(
 
     student = teacher.create_student_model()
 
-    distill = Distiller(student,teacher)
-
+    distill = Distiller(student, teacher)
 
     result = {
         "project_name": project_name,
@@ -122,5 +125,5 @@ def apply_distillation(
         "initiated_time": initiated_time,
         "metrics": metrics,
     }
-    
-    return result 
+
+    return result

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
 from config.celery_utils import get_task_info
+from optimizers.quantization import Quantization
 from tasks.tasks import apply_quantization
 
 router = APIRouter(
@@ -21,6 +22,7 @@ class OptimizeRequest(BaseModel):
     batch_size: int
     learning_rate: float
     optimizer: str
+    color_scheme: str
 
 
 @router.post("/optimize")
@@ -35,7 +37,8 @@ async def optimize(req: OptimizeRequest):
             task = apply_quantization.apply_async(
                 args=[
                     req.project_name, initiated_time, req.project_path,
-                    req.baseline_accuracy, req.epoch, req.batch_size, req.learning_rate, req.optimizer
+                    req.baseline_accuracy, req.epoch, req.batch_size,
+                    req.learning_rate, req.optimizer, req.color_scheme
                 ]
             )
             tasks.append(
