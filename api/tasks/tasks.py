@@ -57,13 +57,8 @@ def apply_pruning(
         project_path=project_path, baseline_accuracy=baseline_accuracy,
         epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer
     )
-    print('Pruning model created')
-
     pruned_model.compile_run()
     metrics = pruned_model.get_metrics()
-
-    pruned_model.strip_model_export()
-    params = pruned_model.get_params()
 
     result = {
         "project_name": project_name,
@@ -75,8 +70,7 @@ def apply_pruning(
         "optimizer": optimizer,
         "technique": "Pruning",
         "initiated_time": initiated_time,
-        "metrics": metrics,
-        "params": params
+        "metrics": metrics
     }
 
     return result

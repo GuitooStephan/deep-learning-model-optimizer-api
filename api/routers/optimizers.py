@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
 from config.celery_utils import get_task_info
-from optimizers.quantization import Quantization
+from optimizers.pruning import Pruning
 from tasks.tasks import apply_quantization
 
 router = APIRouter(
@@ -50,7 +50,28 @@ async def optimize(req: OptimizeRequest):
                 }
             )
         if technique == 'prunning':
-            pass
+            pruned_model = Pruning(
+                project_path=req.project_path, baseline_accuracy=req.baseline_accuracy,
+                epoch=req.epoch, batch_size=req.batch_size, learning_rate=req.learning_rate, optimizer=req.optimizer
+            )
+            print('Pruning model created')
+
+            pruned_model.compile_run()
+            metrics = pruned_model.get_metrics()
+
+            result = {
+                "project_name": req.project_name,
+                "project_path": req.project_path,
+                "baseline_accuracy": req.baseline_accuracy,
+                "epoch": req.epoch,
+                "batch_size": req.batch_size,
+                "learning_rate": req.learning_rate,
+                "optimizer": req.optimizer,
+                "technique": "Pruning",
+                "initiated_time": initiated_time,
+                "metrics": metrics
+            }
+            print(result)
         if technique == 'distillation':
             pass
 
