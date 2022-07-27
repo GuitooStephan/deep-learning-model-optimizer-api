@@ -1,6 +1,6 @@
 
-from api.optimizers.distillation import Distillation
-from api.optimizers.pruning import Pruning
+# from api.optimizers.distillation import Distillation
+# from api.optimizers.pruning import Pruning
 from celery import shared_task
 
 from optimizers.quantization import Quantization
