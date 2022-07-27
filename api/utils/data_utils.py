@@ -10,19 +10,12 @@ def get_dataset(data_folder_path, color_scheme):
     '''
         Make training dataset, testing dataset and validation dataset
     '''
-    X_train = convert_images_to_numpy_array(
-        data_folder_path, "train/*", color_scheme)
-    X_test = convert_images_to_numpy_array(
-        data_folder_path, "test/*", color_scheme)
-    X_val = convert_images_to_numpy_array(
-        data_folder_path, "val/*", color_scheme)
-
-    y_test = pd.read_csv(os.path.join(
-        data_folder_path, "labels_test.csv"), header=None)
-    y_train = pd.read_csv(os.path.join(
-        data_folder_path, "labels_train.csv"), header=None)
-    y_val = pd.read_csv(os.path.join(
-        data_folder_path, "labels_val.csv"), header=None)
+    X_train, y_train = create_x_y(
+        data_folder_path, "train", "labels_train.csv", color_scheme)
+    X_test, y_test = create_x_y(
+        data_folder_path, "test", "labels_test.csv", color_scheme)
+    X_val, y_val = create_x_y(
+        data_folder_path, "val", "labels_val.csv", color_scheme)
 
     le = preprocessing.LabelEncoder()
     le.fit(y_train)
@@ -33,15 +26,23 @@ def get_dataset(data_folder_path, color_scheme):
     return X_train, X_test, X_val, y_train, y_test, y_val
 
 
-def convert_images_to_numpy_array(data_folder_path, folder_name, color_scheme):
+def create_x_y(data_folder_path, images_folder_name, labels_file_name, color_scheme):
     '''
-        Convert images for a folder to numpy arrays
+        Create numpy arrays of predictors and labels from images folder and labels file
     '''
     X = []
-    files = glob.glob(os.path.join(data_folder_path, folder_name))
-    for _file in files:
+
+    images_folder_path = os.path.join(data_folder_path, images_folder_name)
+    labels_file_path = os.path.join(data_folder_path, labels_file_name)
+    labels_df = pd.read_csv(labels_file_path)
+
+    for index in labels_df.index:
+        image_name = labels_df.loc[index, 'id']
+        _file = os.path.join(images_folder_path, f"{image_name}.jpg")
         image = cv2.imread(_file)
         if color_scheme == "grayscale":
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         X.append(image)
-    return np.asarray(X)
+
+    y = labels_df['label']
+    return np.asarray(X), y

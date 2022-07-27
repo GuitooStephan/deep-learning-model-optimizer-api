@@ -19,14 +19,14 @@ def save_images(data_folder_path, folder_name, data):
                     str(i) + ".jpg"), reshape_image)
 
 
-def save_labels_in_csv(data_folder_path, file_name, data):
+def save_labels_in_csv(data_folder_path, file_name, images_size, labels):
     '''
         Save labels in a csv file
     '''
-    df = pd.DataFrame(data, columns=['label'])
+    df = pd.DataFrame(
+        {'id': [_id for _id in range(images_size)], 'label': labels})
     df.to_csv(
-        os.path.join(data_folder_path, file_name),
-        index=False, header=False
+        os.path.join(data_folder_path, file_name)
     )
 
 
@@ -62,6 +62,7 @@ save_images(
 save_labels_in_csv(
     os.path.join(base_project_path, project_id, 'data'),
     "labels_train.csv",
+    len(X_train),
     y_train
 )
 
@@ -73,6 +74,7 @@ save_images(
 save_labels_in_csv(
     os.path.join(base_project_path, project_id, 'data'),
     "labels_test.csv",
+    len(X_test),
     y_test
 )
 
@@ -84,5 +86,6 @@ save_images(
 save_labels_in_csv(
     os.path.join(base_project_path, project_id, 'data'),
     "labels_val.csv",
+    len(X_val),
     y_val
 )
