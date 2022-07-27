@@ -1,28 +1,27 @@
 import time
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter,Depends
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
+from sqlalchemy.orm import Session
+
 
 from config.celery_utils import get_task_info
 from tasks.tasks import apply_quantization, apply_pruning
 
 from db.database import SessionLocal, engine
-import db.db_models
-import db.crud
+from db import db_models
+from db import crud
+from db import database
 
 router = APIRouter(
     tags=['Optimizers'], responses={404: {"description": "Not found"}}
 )
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+db = database.SessionLocal()
 
 class OptimizeRequest(BaseModel):
+    project_id: str
     project_name: str
     project_path: str
     baseline_accuracy: float
@@ -40,7 +39,7 @@ async def optimize(req: OptimizeRequest):
     initiated_time = int(time.time() * 1000)
 
     tasks = []
-
+    projectList=[]
     for technique in req.techniques:
         if technique == "quantization":
             quantization_task = apply_quantization.apply_async(
@@ -77,9 +76,11 @@ async def optimize(req: OptimizeRequest):
         if technique == 'distillation':
             pass
 
-        tasksInfo = [req.project_id,req.project_name, task.id]
-        crud.create_project_task_IDs(db,tasksInfo)
-    return JSONResponse(tasks)
+        projectList.append([req.project_id,req.project_name, task.id])
+    
+    crud.create_project_task_IDs(db,projectList)
+
+    return JSONResponse({"project_id":req.project_id,"project_name":req.project_name,"project_status":"PENDING"})
 
 
 @router.get("/task/{task_id}")

@@ -3,8 +3,11 @@ from fastapi import FastAPI
 
 from routers import optimizers
 from config.celery_utils import create_celery
+from db import db_models
+from db.database import engine
 
 
+db_models.Base.metadata.create_all(bind=engine)
 
 def create_app() -> FastAPI:
     current_app = FastAPI(

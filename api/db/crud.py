@@ -1,16 +1,19 @@
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
-import db_models
+from db import db_models
 
 
-def create_project_task_IDs(db: Session,tasklist):
+def create_project_task_IDs(db: Session,Projectlist):
 
-    projectId, projectName, taskId = tasklist
-    new_project = db_models.Project(
-        projectId = projectId,
-        projectName = projectName,
-        taskId = taskId
-    )
+    tasklist=[]
 
-    db.add(new_project)
+    for i in range(0, len(Projectlist)):
+        projectId, projectName, taskId = Projectlist[i]
+        tasklist.append(db_models.Project(
+                taskId = taskId,
+                projectId = projectId,
+                projectName = projectName
+            ))
+
+    db.bulk_save_objects(tasklist)
     db.commit()

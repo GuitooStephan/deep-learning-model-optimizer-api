@@ -14,7 +14,7 @@ import tensorflow_model_optimization as tfmot
     name='quantization:apply_quantization'
 )
 def apply_quantization(
-        self, project_name: str, initiated_time: int, project_path: str,
+        self, project_id: str,project_name: str, initiated_time: int, project_path: str,
         baseline_accuracy: float, epoch: int, batch_size: int,
         learning_rate: float, optimizer: str, color_scheme: str):
 
@@ -28,6 +28,7 @@ def apply_quantization(
     metrics = quantized_model.get_metrics()
 
     result = {
+        "project_id": project_id,
         "project_name": project_name,
         "project_path": project_path,
         "baseline_accuracy": baseline_accuracy,
