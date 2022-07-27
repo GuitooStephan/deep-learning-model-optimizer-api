@@ -5,6 +5,7 @@ from routers import optimizers
 from config.celery_utils import create_celery
 
 
+
 def create_app() -> FastAPI:
     current_app = FastAPI(
         title='DLMOptimizer',
@@ -17,6 +18,7 @@ def create_app() -> FastAPI:
 
     current_app.celery_app = create_celery()
     return current_app
+
 
 
 app = create_app()

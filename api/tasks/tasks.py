@@ -78,7 +78,7 @@ def apply_pruning(
 
     return result
 
-
+"""  
 # Initiate Distillation
 @shared_task(
     bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 2},
@@ -116,5 +116,7 @@ def apply_distillation(
         "initiated_time": initiated_time,
         # "metrics": metrics,
     }
+    
+    return result 
 
-    return result
+    """

@@ -7,10 +7,20 @@ from starlette.responses import JSONResponse
 from config.celery_utils import get_task_info
 from tasks.tasks import apply_quantization, apply_pruning
 
+from db.database import SessionLocal, engine
+import db.db_models
+import db.crud
+
 router = APIRouter(
     tags=['Optimizers'], responses={404: {"description": "Not found"}}
 )
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 class OptimizeRequest(BaseModel):
     project_name: str
@@ -35,7 +45,7 @@ async def optimize(req: OptimizeRequest):
         if technique == "quantization":
             quantization_task = apply_quantization.apply_async(
                 args=[
-                    req.project_name, initiated_time, req.project_path,
+                    req.project_id,req.project_name, initiated_time, req.project_path,
                     req.baseline_accuracy, req.epoch, req.batch_size,
                     req.learning_rate, req.optimizer, req.color_scheme
                 ]
@@ -67,6 +77,8 @@ async def optimize(req: OptimizeRequest):
         if technique == 'distillation':
             pass
 
+        tasksInfo = [req.project_id,req.project_name, task.id]
+        crud.create_project_task_IDs(db,tasksInfo)
     return JSONResponse(tasks)
 
 
