@@ -50,13 +50,16 @@ def apply_quantization(
 )
 def apply_pruning(
         self, project_name: str, initiated_time: int, project_path: str,
-        baseline_accuracy: float, epoch: int, batch_size: int, learning_rate: float, optimizer: str,):
+        baseline_accuracy: float, epoch: int, batch_size: int,
+        learning_rate: float, optimizer: str, color_scheme: str):
 
     # Creating a object of the chosen optimizer
     pruned_model = Pruning(
         project_path=project_path, baseline_accuracy=baseline_accuracy,
-        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer
+        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer,
+        color_scheme=color_scheme
     )
+
     pruned_model.compile_run()
     metrics = pruned_model.get_metrics()
 
@@ -68,7 +71,7 @@ def apply_pruning(
         "batch_size": batch_size,
         "learning_rate": learning_rate,
         "optimizer": optimizer,
-        "technique": "Pruning",
+        "technique": "pruning",
         "initiated_time": initiated_time,
         "metrics": metrics
     }

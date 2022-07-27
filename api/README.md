@@ -53,11 +53,11 @@ For each worker, open a new terminal, activate the environment and move the acti
 
 ```bash
 # Worker for quantization
-celery -A main.celery worker --pool gevent --loglevel=info -Q quantization -n worker-1 --without-mingle
+celery -A main.celery worker --pool gevent --loglevel=info -Q quantization -n worker-1
 # Worker for pruning
-celery -A main.celery worker --pool gevent --loglevel=info -Q pruning -n worker-2 --without-mingle
+celery -A main.celery worker --pool gevent --loglevel=info -Q pruning -n worker-2
 # Worker for distillation
-celery -A main.celery worker --pool gevent --loglevel=info -Q knowledge-distillation -n worker-3 --without-mingle
+celery -A main.celery worker --pool gevent --loglevel=info -Q knowledge-distillation -n worker-3
 ```
 
 ## Contributing

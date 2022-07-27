@@ -14,7 +14,7 @@ class Quantization(Optimizer):
         super().__init__(
             project_path, baseline_accuracy,
             epoch, batch_size, learning_rate,
-            optimizer, color_scheme)
+            optimizer, color_scheme, 'quantization')
         self.create_model()
         print('Quantization initialized')
 

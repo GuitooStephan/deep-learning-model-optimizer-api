@@ -9,7 +9,9 @@ from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 
 
 class Optimizer(object):
-    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer, color_scheme):
+    def __init__(
+            self, project_path, baseline_accuracy, epoch, batch_size,
+            learning_rate, optimizer, color_scheme, technique):
         self.project_path = project_path
         self.baseline_accuracy = baseline_accuracy
         self.baseline_model_path = os.path.join(project_path, "model.h5")
@@ -18,12 +20,14 @@ class Optimizer(object):
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.color_scheme = color_scheme
+        self.technique = technique
 
         self.set_optimizer(optimizer)
         self.load_baseline_model()
         self.preprocess()
 
     def create_model(self):
+        # TODO: Investigate why the training accuracy is not as expected
         pass
 
     def preprocess(self):

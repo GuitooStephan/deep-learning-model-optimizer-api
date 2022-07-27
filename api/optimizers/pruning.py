@@ -7,9 +7,11 @@ from optimizers.optimizer import Optimizer
 
 
 class Pruning(Optimizer):
-    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer):
-        super().__init__(project_path, baseline_accuracy,
-                         epoch, batch_size, learning_rate, optimizer)
+    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer, color_scheme):
+        super().__init__(
+            project_path, baseline_accuracy,
+            epoch, batch_size, learning_rate, optimizer, color_scheme, 'pruning'
+        )
         self.create_model()
         print('Pruning initialized')
 
@@ -61,7 +63,7 @@ class Pruning(Optimizer):
         for i, w in enumerate(self.pruned_model.get_weights()):
             total = total + w.size
             zeros = zeros + np.sum(w == 0)
-        self.metrics['parameters'] = total - zeros
+        self.metrics['parameters'] = int(total - zeros)
 
     def save_model(self):
         self.pruned_model.save(os.path.join(
