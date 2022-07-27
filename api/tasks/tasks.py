@@ -1,7 +1,13 @@
 
+from api.optimizers.distillation import Distillation
+from api.optimizers.pruning import Pruning
 from celery import shared_task
 
 from optimizers.quantization import Quantization
+from optimizers.quantization import Pruning
+from optimizers.distillation import Distiller
+
+import tensorflow_model_optimization as tfmot
 
 
 # Initiate quantization
@@ -36,3 +42,85 @@ def apply_quantization(
         "metrics": metrics
     }
     return result
+
+# Initiate Pruning
+@shared_task(
+    bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 2},
+    name='pruning:apply_pruning'
+)
+def apply_pruning(
+        self, project_name: str, initiated_time: int, project_path: str,
+        baseline_accuracy: float, epoch: int, batch_size: int, learning_rate: float, optimizer: str,):
+
+    print('Task pruning:apply_pruning')
+
+    # Creating a object of the chosen optimizer
+    pruned_model = Pruning(
+        project_path=project_path, baseline_accuracy=baseline_accuracy,
+        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer
+    )
+    print('Pruning model created')
+
+    pruned_model.compile_run()
+    metrics = pruned_model.get_metrics()
+
+    pruned_model.strip_model_export()
+    params = pruned_model.get_params()
+
+    result = {
+        "project_name": project_name,
+        "project_path": project_path,
+        "baseline_accuracy": baseline_accuracy,
+        "epoch": epoch,
+        "batch_size": batch_size,
+        "learning_rate": learning_rate,
+        "optimizer": optimizer,
+        "technique": "Pruning",
+        "initiated_time": initiated_time,
+        "metrics": metrics,
+        "params":params
+    }
+
+    return result 
+
+
+# Initiate Distillation
+@shared_task(
+    bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 2},
+    name='distillation:apply_distillation'
+)
+def apply_distillation(
+        self, project_name: str, initiated_time: int, project_path: str,
+        baseline_accuracy: float, epoch: int, batch_size: int, learning_rate: float, optimizer: str,):
+
+    print('Task distillation:apply_distillation')
+
+    # Creating a object of the chosen optimizer
+    teacher = Distillation(
+        project_path=project_path, baseline_accuracy=baseline_accuracy,
+        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer
+    )
+    print('Teacher model created')
+
+    teacher.compile_run()
+    teacher.get_metrics()
+
+    student = teacher.create_student_model()
+
+    distill = Distiller(student,teacher)
+
+
+    result = {
+        "project_name": project_name,
+        "project_path": project_path,
+        "baseline_accuracy": baseline_accuracy,
+        "epoch": epoch,
+        "batch_size": batch_size,
+        "learning_rate": learning_rate,
+        "optimizer": optimizer,
+        "technique": "Distillation",
+        "initiated_time": initiated_time,
+        "metrics": metrics,
+    }
+    
+    return result 

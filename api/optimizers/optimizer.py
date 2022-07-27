@@ -3,6 +3,7 @@ import time
 import tensorflow as tf
 
 from utils.data_utils import get_dataset
+import tensorflow_model_optimization as tfmot
 
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 
@@ -67,13 +68,27 @@ class Optimizer:
         return None  # Added to avoid training the model - unsupported machine
 
         training_st = time.process_time()
-        self.hist = self.model.fit(
-            X_train, X_test,
-            batch_size=self.batch_size,
-            epochs=self.epochs,
-            verbose=2,
-            validation_data=(X_val, y_val)
-        )
+
+        if optimizer == 'pruning':
+
+            self.hist = self.model.fit(
+                X_train, X_test,
+                batch_size=self.batch_size,
+                epochs=self.epochs,
+                verbose=2,
+                validation_data=(X_val, y_val),
+                callbacks = tfmot.sparsity.keras.UpdatePruningStep()
+            )
+            
+        else:
+
+            self.hist = self.model.fit(
+                X_train, X_test,
+                batch_size=self.batch_size,
+                epochs=self.epochs,
+                verbose=2,
+                validation_data=(X_val, y_val)
+            )
         training_et = time.process_time()
 
         self.training_time = training_et - training_st

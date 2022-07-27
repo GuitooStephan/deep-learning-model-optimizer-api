@@ -62,6 +62,7 @@ class Quantization(Optimizer):
         self.lite_model_accuracy = acc/len(self.X_test)
 
     def save_model(self):
+
         self.model.save(os.path.join(self.project_path, 'quantized_model.h5'))
         open(os.join.path(self.project_path, "quantized_model_lite.tflite"),
              "wb").write(self.model_lite)

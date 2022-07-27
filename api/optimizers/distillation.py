@@ -3,14 +3,25 @@ from tensorflow.keras.layers import Activation, Dropout, BatchNormalization, Den
 from tensorflow.keras.optimizers import SGD, RMSprop, Adam
 from tensorflow import keras
 import tensorflow as tf
+from optimizers.optimizer import Optimizer
 
 
-class Distillation:
+class Distillation(Optimizer):
+    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer):
+        super().__init__(project_path, baseline_accuracy,
+                         epoch, batch_size, learning_rate, optimizer)
+        self.create_model()
+        print('Distillation initialized')
 
-    def create_studentModel():
+    def create_model(self):
+        self.teacher = tf.keras.models.clone_model(
+            self.baseline_model
+        )
 
-        student = Sequential([
-            Conv2D(16, kernel_size=(3, 3),padding='same',input_shape=(28, 28, 1)),
+    def create_student_model(self):
+
+        self.student = Sequential([
+            Conv2D(16, kernel_size=(3, 3),padding='same',input_shape=self.input_shape),
             Activation('relu'),
             Conv2D(16, kernel_size=(3, 3),padding='same'),
             Activation('relu'),
@@ -32,9 +43,8 @@ class Distillation:
             Dense(10),
             Activation('softmax'),
             ])
-        
-        return student
-
+    
+        return self.student
 
 
 class Distiller(keras.Model):
