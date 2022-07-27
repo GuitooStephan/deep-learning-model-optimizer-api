@@ -1,11 +1,9 @@
 
-# from api.optimizers.distillation import Distillation
-# from api.optimizers.pruning import Pruning
 from celery import shared_task
 
 from optimizers.quantization import Quantization
-from optimizers.quantization import Pruning
-from optimizers.distillation import Distiller
+from optimizers.pruning import Pruning
+from optimizers.distillation import Distillation, Distiller
 
 import tensorflow_model_optimization as tfmot
 
@@ -55,8 +53,6 @@ def apply_quantization(
 def apply_pruning(
         self, project_name: str, initiated_time: int, project_path: str,
         baseline_accuracy: float, epoch: int, batch_size: int, learning_rate: float, optimizer: str,):
-
-    print('Task pruning:apply_pruning')
 
     # Creating a object of the chosen optimizer
     pruned_model = Pruning(
@@ -123,7 +119,7 @@ def apply_distillation(
         "optimizer": optimizer,
         "technique": "Distillation",
         "initiated_time": initiated_time,
-        "metrics": metrics,
+        # "metrics": metrics,
     }
 
     return result

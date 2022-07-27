@@ -25,12 +25,12 @@ class Pruning(Optimizer):
         )
 
         pruning_params = {
-        'pruning_schedule': tfmot.sparsity.keras.PolynomialDecay(
-            initial_sparsity=0.0,
-            final_sparsity=0.75,
-            begin_step=0,
-            end_step=15000
-        )}
+            'pruning_schedule': tfmot.sparsity.keras.PolynomialDecay(
+                initial_sparsity=0.0,
+                final_sparsity=0.75,
+                begin_step=0,
+                end_step=15000
+            )}
 
         self.model = tfmot.sparsity.keras.prune_low_magnitude(
             pruning_model, **pruning_params
@@ -38,7 +38,7 @@ class Pruning(Optimizer):
 
     def compile_run(self):
         super().compile_run()
-        
+
         self.save_model()
 
     def get_metrics(self):
@@ -48,34 +48,32 @@ class Pruning(Optimizer):
         )
         return self.metrics
 
-
     def strip_model_export(self):
 
-        pruned_model_for_export = tfmot.sparsity.keras.strip_pruning(self.model)
+        pruned_model_for_export = tfmot.sparsity.keras.strip_pruning(
+            self.model)
         pruned_model_for_export.compile(
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-        metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
-        optimizer=Adam(lr=10**-3)
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(
+                from_logits=True),
+            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
+            optimizer=Adam(lr=10**-3)
         )
-        pruned_model_for_export.save(os.path.join(self.project_path,'cnn_pruning.h5'))
- 
+        pruned_model_for_export.save(os.path.join(
+            self.project_path, 'cnn_pruning.h5'))
 
     def get_params(self):
 
-        pruned_model_for_export = tf.keras.models.load_model(os.path.join(self.project_path,'cnn_pruning.h5'))
+        pruned_model_for_export = tf.keras.models.load_model(
+            os.path.join(self.project_path, 'cnn_pruning.h5'))
 
         # Remove the weights not equal to 0
         total = 0
         zeros = 0
         for i, w in enumerate(pruned_model_for_export.get_weights()):
-            total= total + w.size
+            total = total + w.size
             zeros = zeros + np.sum(w == 0)
         self.params = total - zeros
         return self.params
 
-
     def save_model(self):
         self.model.save(os.path.join(self.project_path, 'pruned_model.h5'))
-
-    
-
