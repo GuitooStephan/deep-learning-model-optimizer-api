@@ -11,7 +11,7 @@ def create_celery():
     celery_app.conf.update(task_serializer='json')
     celery_app.conf.update(result_serializer='json')
     celery_app.conf.update(accept_content=['json'])
-    celery_app.conf.update(result_expires=1000)
+    celery_app.conf.update(result_expires=86400000)
     celery_app.conf.update(result_persistent=True)
     celery_app.conf.update(worker_send_task_events=False)
     celery_app.conf.update(worker_prefetch_multiplier=1)
@@ -36,3 +36,11 @@ def get_task_info(task_id):
         "task_result": task_result.get() if task_result.ready() else None,
     }
     return result
+
+
+def get_task_status(task_id):
+    """
+    return task info for the given task_id
+    """
+    task_result = AsyncResult(task_id)
+    return task_result.ready()
