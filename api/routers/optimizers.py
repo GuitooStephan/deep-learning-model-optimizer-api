@@ -42,7 +42,7 @@ async def optimize(req: OptimizeRequest):
     projectList=[]
     for technique in req.techniques:
         if technique == "quantization":
-            quantization_task = apply_quantization.apply_async(
+            task = apply_quantization.apply_async(
                 args=[
                     req.project_id,req.project_name, initiated_time, req.project_path,
                     req.baseline_accuracy, req.epoch, req.batch_size,
@@ -51,14 +51,14 @@ async def optimize(req: OptimizeRequest):
             )
             tasks.append(
                 {
-                    "task_id": quantization_task.id,
+                    "task_id": task.id,
                     "initiated_time": initiated_time,
                     "technique": "quantization",
                     "status": 'PENDING'
                 }
             )
         if technique == 'pruning':
-            prunning_task = apply_pruning.apply_async(
+            task = apply_pruning.apply_async(
                 args=[
                     req.project_name, initiated_time, req.project_path,
                     req.baseline_accuracy, req.epoch, req.batch_size,
@@ -67,7 +67,7 @@ async def optimize(req: OptimizeRequest):
             )
             tasks.append(
                 {
-                    "task_id": prunning_task.id,
+                    "task_id": task.id,
                     "initiated_time": initiated_time,
                     "technique": "pruning",
                     "status": 'PENDING'
