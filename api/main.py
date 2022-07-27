@@ -1,13 +1,16 @@
 import uvicorn
 from fastapi import FastAPI
+from dotenv import load_dotenv
 
 from routers import optimizers
 from config.celery_utils import create_celery
 from db import db_models
 from db.database import engine
 
+load_dotenv('./.env')
 
 db_models.Base.metadata.create_all(bind=engine)
+
 
 def create_app() -> FastAPI:
     current_app = FastAPI(
@@ -21,7 +24,6 @@ def create_app() -> FastAPI:
 
     current_app.celery_app = create_celery()
     return current_app
-
 
 
 app = create_app()

@@ -1,8 +1,16 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 
-engine=create_engine("postgresql://postgres:postgres@localhost/project_tasks",
+load_dotenv()
+
+engine = create_engine(
+    os.environ.get(
+        "POSTGRES_DATABASE_URL",
+        "postgresql://postgres:postgres@localhost/project_tasks"
+    ),
     echo=True
 )
 
@@ -14,5 +22,3 @@ if not database_exists(engine.url):
 SessionLocal = sessionmaker(bind=engine)
 
 Base = declarative_base()
-
-
