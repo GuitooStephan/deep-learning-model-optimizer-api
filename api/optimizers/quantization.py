@@ -38,7 +38,7 @@ class Quantization(Optimizer):
         super().get_metrics()
         self.get_accuracy_of_lite_model()
         self.metrics['quantized_model_size'] = self.get_model_size(
-            os.path.join(self.project_path, 'quantized_model.h5')
+            os.path.join(self.project_path, 'quantized_model_lite.tflite')
         )
         self.metrics['test accuracy'] = self.lite_model_accuracy
         return self.metrics

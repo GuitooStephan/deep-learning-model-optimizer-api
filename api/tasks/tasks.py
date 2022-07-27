@@ -18,14 +18,12 @@ def apply_quantization(
         baseline_accuracy: float, epoch: int, batch_size: int,
         learning_rate: float, optimizer: str, color_scheme: str):
 
-    print('Task quantization:apply_quantization')
     # Creating a object of the chosen optimizer
     quantized_model = Quantization(
         project_path, baseline_accuracy, epoch,
         batch_size, learning_rate, optimizer,
         color_scheme
     )
-    print('Quantization model created')
     quantized_model.compile_run()
     metrics = quantized_model.get_metrics()
 
