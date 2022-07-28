@@ -11,9 +11,9 @@ import time
 
 class Distillation(Optimizer):
 
-    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer,color_scheme,technique):
+    def __init__(self, project_path, baseline_accuracy, epoch, batch_size, learning_rate, optimizer,color_scheme):
         super().__init__(project_path, baseline_accuracy,
-                         epoch, batch_size, learning_rate, optimizer,color_scheme,technique)
+                         epoch, batch_size, learning_rate, optimizer,color_scheme)
         self.create_model()
         print('Distillation initialized')
 
@@ -92,7 +92,7 @@ class Distiller(keras.Model):
             self,
             optimizer,
             metrics,
-            student_loss_fn,
+            student_loss_fn, 
             distillation_loss_fn,
             alpha=0.1,
             temperature=3,
@@ -109,7 +109,7 @@ class Distiller(keras.Model):
         
         # Forward pass of teacher
         teacher_prediction=self.teacher(x, training=False)
-        print("Tecaher prediction   ...", teacher_prediction)
+        print("Teacher prediction   ...", teacher_prediction)
         with tf.GradientTape() as tape:
         
             # Forward pass of student

@@ -87,15 +87,16 @@ def apply_pruning(
     name='distillation:apply_distillation'
 )
 def apply_distillation(
-        self, project_id: str, project_name: str, project_path: str,
-        baseline_accuracy: float, epoch: int, batch_size: int, learning_rate: float, optimizer: str,color_scheme:str, technique:str):
+        self, project_id: str, project_name: str, initiated_time: int, project_path: str,
+        baseline_accuracy: float, epoch: int, batch_size: int, 
+        learning_rate: float, optimizer: str,color_scheme:str):
 
     print('Task distillation:apply_distillation')
 
     # Creating a object of the chosen optimizer
     distilled_model = Distillation(
         project_path=project_path, baseline_accuracy=baseline_accuracy,
-        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer,color_scheme=color_scheme,technique=technique
+        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer,color_scheme=color_scheme
     )
     print('Teacher model created')
 

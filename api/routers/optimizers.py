@@ -104,8 +104,3 @@ async def get_task_status(task_id: str) -> dict:
     """
     return get_task_info(task_id)
 
-@router.post("/optimize_test")
-async def optimize_test(req: OptimizeRequest):
-    tasks.apply_distillation(req.project_id,req.project_name, req.project_path,
-                    req.baseline_accuracy, req.epoch, req.batch_size,
-                    req.learning_rate, req.optimizer, req.color_scheme,req.techniques[0])
