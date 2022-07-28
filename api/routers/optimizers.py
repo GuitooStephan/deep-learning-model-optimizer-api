@@ -107,11 +107,17 @@ async def get_task_report(project_id: str, db: Session = Depends(get_db)) -> dic
     tasks = crud.get_project_tasks(db, project_id)
     results = []
 
+    if len(tasks) == 0:
+        return JSONResponse(results)
+
+    project_id = tasks[0].project_id
+    project_name = tasks[0].project_name
+
     for task in tasks:
         task_info = get_task_info(task.task_id)
         results.append(task_info)
 
-    return JSONResponse(results)
+    return JSONResponse({"project_id": project_id, "project_name": project_name, "tasks": results})
 
 
 @router.get("/task/{task_id}")
