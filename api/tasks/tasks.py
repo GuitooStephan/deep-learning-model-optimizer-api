@@ -15,7 +15,7 @@ import tensorflow_model_optimization as tfmot
     name='quantization:apply_quantization'
 )
 def apply_quantization(
-        self, project_id: str,project_name: str, initiated_time: int, project_path: str,
+        self, project_id: str, project_name: str, initiated_time: int, project_path: str,
         baseline_accuracy: float, epoch: int, batch_size: int,
         learning_rate: float, optimizer: str, color_scheme: str):
 
@@ -66,6 +66,7 @@ def apply_pruning(
     metrics = pruned_model.get_metrics()
 
     result = {
+        "project_id": project_id,
         "project_name": project_name,
         "project_path": project_path,
         "baseline_accuracy": baseline_accuracy,
@@ -88,21 +89,22 @@ def apply_pruning(
 )
 def apply_distillation(
         self, project_id: str, project_name: str, initiated_time: int, project_path: str,
-        baseline_accuracy: float, epoch: int, batch_size: int, 
-        learning_rate: float, optimizer: str,color_scheme:str):
+        baseline_accuracy: float, epoch: int, batch_size: int,
+        learning_rate: float, optimizer: str, color_scheme: str):
 
     print('Task distillation:apply_distillation')
 
     # Creating a object of the chosen optimizer
     distilled_model = Distillation(
         project_path=project_path, baseline_accuracy=baseline_accuracy,
-        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer,color_scheme=color_scheme
+        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer, color_scheme=color_scheme
     )
     print('Teacher model created')
 
     metrics = distilled_model.get_metrics()
 
     result = {
+        "project_id": project_id,
         "project_name": project_name,
         "project_path": project_path,
         "baseline_accuracy": baseline_accuracy,
@@ -110,11 +112,9 @@ def apply_distillation(
         "batch_size": batch_size,
         "learning_rate": learning_rate,
         "optimizer": optimizer,
-        "technique": "Distillation",
+        "technique": "distillation",
         "initiated_time": initiated_time,
-        # "metrics": metrics,
+        "metrics": metrics
     }
-    
-    return result 
 
-
+    return result

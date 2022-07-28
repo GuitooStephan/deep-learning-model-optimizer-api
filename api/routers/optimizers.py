@@ -5,11 +5,9 @@ from pydantic import BaseModel
 from starlette.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-
 from config.celery_utils import get_task_info
 from tasks.tasks import apply_quantization, apply_pruning, apply_distillation
 from db import crud
-from tasks import tasks
 from config.celery_utils import get_task_info, get_task_status as get_celery_task_status
 from tasks.tasks import apply_quantization, apply_pruning
 from db.database import SessionLocal
@@ -71,14 +69,6 @@ async def optimize(req: OptimizeRequest, db: Session = Depends(get_db)):
                     req.baseline_accuracy, req.epoch, req.batch_size,
                     req.learning_rate, req.optimizer, req.color_scheme
                 ]
-            )
-            tasks.append(
-                {
-                    "task_id": task.id,
-                    "initiated_time": initiated_time,
-                    "technique": "distillation",
-                    "status": 'PENDING'
-                }
             )
 
         project_tasks.append([req.project_id, req.project_name, task.id])

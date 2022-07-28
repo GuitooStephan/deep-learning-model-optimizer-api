@@ -28,7 +28,6 @@ class Optimizer(object):
         self.preprocess()
 
     def create_model(self):
-        # TODO: Investigate why the training accuracy is not as expected
         pass
 
     def preprocess(self):
@@ -71,8 +70,8 @@ class Optimizer(object):
                 optimizer=self.optimizer
             )
 
-        print('Fitting model...')
-        return None  # Added to avoid training the model - unsupported machine
+        # print('Fitting model...')
+        # return None  # Added to avoid training the model - unsupported machine
 
         training_st = time.process_time()
         self.hist = self.model.fit(
@@ -136,6 +135,7 @@ class Optimizer(object):
             self.input_shape = (
                 self.X_train.shape[1], self.X_train.shape[2], self.X_train.shape[3])
         elif self.color_scheme == "grayscale":
-            self.input_shape = (self.X_train.shape[1], self.X_train.shape[2])
+            self.input_shape = (
+                self.X_train.shape[1], self.X_train.shape[2], 1)
         else:
             raise ValueError("Invalid color scheme")
