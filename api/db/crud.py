@@ -24,4 +24,6 @@ def get_project_tasks(db: Session, project_id: str):
         db_models.ProjectTasks
     ).where(
         db_models.ProjectTasks.project_id == project_id
+    ).order_by(
+        desc(db_models.ProjectTasks.created_at)
     ).all()

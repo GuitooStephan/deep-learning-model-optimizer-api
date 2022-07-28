@@ -109,6 +109,21 @@ async def get_task_status(req: ProjectsStatus, db: Session = Depends(get_db)) ->
     return JSONResponse(results)
 
 
+@router.get("/report/project/{project_id}")
+async def get_task_report(project_id: str, db: Session = Depends(get_db)) -> dict:
+    """
+    Return the report of all the tasks for a given project
+    """
+    tasks = crud.get_project_tasks(db, project_id)
+    results = []
+
+    for task in tasks:
+        task_info = get_task_info(task.task_id)
+        results.append(task_info)
+
+    return JSONResponse(results)
+
+
 @router.get("/task/{task_id}")
 async def get_task_status(task_id: str) -> dict:
     """
