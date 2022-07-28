@@ -10,6 +10,7 @@ from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 
 class Optimizer(object):
     def __init__(
+
             self, project_path, baseline_accuracy, epoch, batch_size,
             learning_rate, optimizer, color_scheme, technique):
         self.project_path = project_path
@@ -61,15 +62,17 @@ class Optimizer(object):
         print(self.optimizer)
         print(self.learning_rate)
 
-        self.model.compile(
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(
-                from_logits=True),
-            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
-            optimizer=self.optimizer
-        )
+        if self.technique != 'distillation':
 
-        # print('Fitting model...')
-        # return None  # Added to avoid training the model - unsupported machine
+            self.model.compile(
+                loss=tf.keras.losses.SparseCategoricalCrossentropy(
+                    from_logits=True),
+                metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
+                optimizer=self.optimizer
+            )
+
+        print('Fitting model...')
+        return None  # Added to avoid training the model - unsupported machine
 
         training_st = time.process_time()
         self.hist = self.model.fit(

@@ -1,4 +1,5 @@
 
+from numpy import str_
 from celery import shared_task
 
 from optimizers.quantization import Quantization
@@ -50,7 +51,7 @@ def apply_quantization(
     name='pruning:apply_pruning'
 )
 def apply_pruning(
-        self, project_name: str, initiated_time: int, project_path: str,
+        self, project_id: str, project_name: str, initiated_time: int, project_path: str,
         baseline_accuracy: float, epoch: int, batch_size: int,
         learning_rate: float, optimizer: str, color_scheme: str):
 
@@ -79,31 +80,26 @@ def apply_pruning(
 
     return result
 
-"""  
+
 # Initiate Distillation
 @shared_task(
     bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 2},
     name='distillation:apply_distillation'
 )
 def apply_distillation(
-        self, project_name: str, initiated_time: int, project_path: str,
-        baseline_accuracy: float, epoch: int, batch_size: int, learning_rate: float, optimizer: str,):
+        self, project_id: str, project_name: str, project_path: str,
+        baseline_accuracy: float, epoch: int, batch_size: int, learning_rate: float, optimizer: str,color_scheme:str, technique:str):
 
     print('Task distillation:apply_distillation')
 
     # Creating a object of the chosen optimizer
-    teacher = Distillation(
+    distilled_model = Distillation(
         project_path=project_path, baseline_accuracy=baseline_accuracy,
-        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer
+        epoch=epoch, batch_size=batch_size, learning_rate=learning_rate, optimizer=optimizer,color_scheme=color_scheme,technique=technique
     )
     print('Teacher model created')
 
-    teacher.compile_run()
-    teacher.get_metrics()
-
-    student = teacher.create_student_model()
-
-    distill = Distiller(student, teacher)
+    metrics = distilled_model.get_metrics()
 
     result = {
         "project_name": project_name,
@@ -120,4 +116,4 @@ def apply_distillation(
     
     return result 
 
-    """
+

@@ -7,12 +7,12 @@ from sqlalchemy.orm import Session
 
 
 from config.celery_utils import get_task_info
-from tasks.tasks import apply_quantization, apply_pruning
-
+from tasks.tasks import apply_quantization, apply_pruning, apply_distillation
 from db.database import SessionLocal, engine
 from db import db_models
 from db import crud
 from db import database
+from tasks import tasks
 
 router = APIRouter(
     tags=['Optimizers'], responses={404: {"description": "Not found"}}
@@ -60,7 +60,7 @@ async def optimize(req: OptimizeRequest):
         if technique == 'pruning':
             task = apply_pruning.apply_async(
                 args=[
-                    req.project_name, initiated_time, req.project_path,
+                    req.project_id,req.project_name, initiated_time, req.project_path,
                     req.baseline_accuracy, req.epoch, req.batch_size,
                     req.learning_rate, req.optimizer, req.color_scheme
                 ]
@@ -74,7 +74,21 @@ async def optimize(req: OptimizeRequest):
                 }
             )
         if technique == 'distillation':
-            pass
+            task = apply_distillation.apply_async(
+                args=[
+                    req.project_id,req.project_name, initiated_time, req.project_path,
+                    req.baseline_accuracy, req.epoch, req.batch_size,
+                    req.learning_rate, req.optimizer, req.color_scheme
+                ]
+            )
+            tasks.append(
+                {
+                    "task_id": task.id,
+                    "initiated_time": initiated_time,
+                    "technique": "distillation",
+                    "status": 'PENDING'
+                }
+            )
 
         projectList.append([req.project_id,req.project_name, task.id])
     
@@ -89,3 +103,9 @@ async def get_task_status(task_id: str) -> dict:
     Return the status of the submitted Task
     """
     return get_task_info(task_id)
+
+@router.post("/optimize_test")
+async def optimize_test(req: OptimizeRequest):
+    tasks.apply_distillation(req.project_id,req.project_name, req.project_path,
+                    req.baseline_accuracy, req.epoch, req.batch_size,
+                    req.learning_rate, req.optimizer, req.color_scheme,req.techniques[0])
