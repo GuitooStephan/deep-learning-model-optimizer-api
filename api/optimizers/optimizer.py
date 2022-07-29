@@ -61,14 +61,12 @@ class Optimizer(object):
         print(self.optimizer)
         print(self.learning_rate)
 
-        if self.technique != 'distillation':
-
-            self.model.compile(
-                loss=tf.keras.losses.SparseCategoricalCrossentropy(
-                    from_logits=True),
-                metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
-                optimizer=self.optimizer
-            )
+        self.model.compile(
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(
+                from_logits=True),
+            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
+            optimizer=self.optimizer
+        )
 
         # print('Fitting model...')
         # return None  # Added to avoid training the model - unsupported machine
@@ -78,9 +76,10 @@ class Optimizer(object):
             self.X_train, self.y_train,
             batch_size=self.batch_size,
             epochs=self.epoch,
-            verbose=0,
+            verbose=2,
             validation_data=(self.X_val, self.y_val)
         )
+
         training_et = time.process_time()
 
         self.training_time = training_et - training_st

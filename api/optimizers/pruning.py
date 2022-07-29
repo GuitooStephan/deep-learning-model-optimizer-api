@@ -1,3 +1,4 @@
+import time
 import tensorflow as tf
 import tensorflow_model_optimization as tfmot
 import os
@@ -16,27 +17,49 @@ class Pruning(Optimizer):
         print('Pruning initialized')
 
     def create_model(self):
-        pruning_model = tf.keras.models.clone_model(
+        self.model = tf.keras.models.clone_model(
             self.baseline_model,
         )
+
+        num_images = self.X_train.shape[0]
+        end_step = np.ceil(
+            num_images / self.batch_size).astype(np.int32) * self.epoch
+        print(end_step)
 
         pruning_params = {
             'pruning_schedule': tfmot.sparsity.keras.PolynomialDecay(
                 initial_sparsity=0.0,
-                final_sparsity=0.75,
+                final_sparsity=0.80,
                 begin_step=0,
-                end_step=15000
+                end_step=end_step
             )
         }
 
         self.model = tfmot.sparsity.keras.prune_low_magnitude(
-            pruning_model, **pruning_params
+            self.model, **pruning_params
         )
 
     def compile_run(self):
-        super().compile_run()
-        self.strip_model_export()
+        self.model.compile(
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(
+                from_logits=True),
+            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
+            optimizer=self.optimizer
+        )
 
+        training_st = time.process_time()
+        self.hist = self.model.fit(
+            self.X_train, self.y_train,
+            batch_size=self.batch_size,
+            epochs=self.epoch,
+            verbose=2,
+            validation_data=(self.X_val, self.y_val),
+            callbacks=tfmot.sparsity.keras.UpdatePruningStep()
+        )
+        training_et = time.process_time()
+        self.training_time = training_et - training_st
+
+        self.strip_model_export()
         self.save_model()
 
     def get_metrics(self):
@@ -49,12 +72,12 @@ class Pruning(Optimizer):
 
     def strip_model_export(self):
         self.pruned_model = tfmot.sparsity.keras.strip_pruning(self.model)
-        self.pruned_model.compile(
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(
-                from_logits=True),
-            metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
-            optimizer=self.optimizer
-        )
+        # self.pruned_model.compile(
+        #     loss=tf.keras.losses.SparseCategoricalCrossentropy(
+        #         from_logits=True),
+        #     metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
+        #     optimizer=self.optimizer
+        # )
 
     def get_number_of_parameters(self):
         # Remove the weights not equal to 0
