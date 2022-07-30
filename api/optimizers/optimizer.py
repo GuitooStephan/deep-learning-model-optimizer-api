@@ -3,14 +3,12 @@ import time
 import tensorflow as tf
 
 from utils.data_utils import get_dataset
-import tensorflow_model_optimization as tfmot
 
 from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 
 
 class Optimizer(object):
     def __init__(
-
             self, project_path, baseline_accuracy, epoch, batch_size,
             learning_rate, optimizer, color_scheme, technique):
         self.project_path = project_path
