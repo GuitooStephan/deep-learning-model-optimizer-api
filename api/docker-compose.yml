@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  broker:
+    image: rabbitmq:alpine
+    container_name: 'rabbitmq'
+    environment:
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
+    ports:
+      - '5672:5672'
+
+  worker-1:
+    build: .
+    command: 'celery -A main.celery worker --loglevel=info -Q quantization -n worker-1'
+    container_name: 'worker-1'
+
+  worker-2:
+    build: .
+    command: 'celery -A main.celery worker --loglevel=info -Q pruning -n worker-2'
+    container_name: 'worker-2'
+
+  worker-3:
+    build: .
+    command: 'celery -A main.celery worker --loglevel=info -Q knowledge-distillation -n worker-3'
+    container_name: 'worker-3'
+
+  api:
+    build: .
+    container_name: 'api'
+    depends_on:
+      - 'broker'
+    links:
+      - 'worker-1'
+      - 'worker-2'
+      - 'worker-3'
+      - 'broker'
+    ports:
+      - '8080:8080'
