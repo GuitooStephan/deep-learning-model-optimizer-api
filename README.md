@@ -29,10 +29,8 @@ while the database was built with **PostgreSQL**. Background tasks were
 executed using **Celery**. **Streamlit** was employed for the frontend.
 
 ## The repositories
-- 
-[**API**](https://github.com/GuitooStephan/deep-learning-model-optimizer-api/tree/master/api)
-- 
-[**WEB**](https://github.com/GuitooStephan/deep-learning-model-optimizer-web)
+- [**API**](https://github.com/GuitooStephan/deep-learning-model-optimizer-api/tree/master/api)
+- [**WEB**](https://github.com/GuitooStephan/deep-learning-model-optimizer-web)
 
 
 
